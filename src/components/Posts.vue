@@ -1,16 +1,16 @@
 <template>
-  <div class="posts">
-  <section v-if="errored">
+  <div class="container">
+  <sdiv v-if="errored">
     <p>
       We're sorry, we're not able to retrieve this information at the moment, please try back later
     </p>
-  </section>
-  <section v-else>
+  </sdiv>
+  <div v-else>
     <div v-if="loading">Loading...</div>
-  </section>
+  </div>
   <section v-for="(post, index) in posts" :key="post.id">
       <h2 >title: {{post.title}}
-        <button @click="removePost(index)">Remove</button>
+        <button @click="deletePost(index, post.id)">Delete</button>
       </h2>
       <span v-for="person in authors" :key="person.id">
         {{post.userId === person.id ? `author: ${person.name}` : null}}
@@ -19,14 +19,27 @@
       <p v-if="post.isFullText">{{post.body}}</p>
       <button @click="onFullText(index)">{{post.isFullText ? 'Read less' : 'Read more'}}</button>
     </section>
+    <paginate
+      v-model="page"
+      :page-count="10"
+      :click-handler="updatePage"
+      :prev-text="'Prev'"
+      :next-text="'Next'"
+      :container-class="'pagination'">
+    </paginate>
   </div>
 </template>
 
 <script>
+import Paginate from 'vuejs-paginate';
+
 const API = 'https://jsonplaceholder.typicode.com/';
 
 export default {
   name: 'Posts',
+  components: {
+    Paginate,
+  },
   props: {
     msg: String,
   },
@@ -36,18 +49,19 @@ export default {
       authors: [],
       loading: true,
       errored: false,
+      page: 1,
     };
   },
 
   mounted() {
-    this.getPosts();
+    this.getPosts(this.page);
     this.getAuthors();
   },
 
   methods: {
-    async getPosts() {
+    async getPosts(pageNumber) {
       try {
-        const res = await fetch(`${API}posts`, { method: 'GET' });
+        const res = await fetch(`${API}posts?_page=${pageNumber}`, { method: 'GET' });
 
         if (!res.ok) throw new Error(`Error request, status: ${res.status}`);
 
@@ -74,8 +88,22 @@ export default {
       }
     },
 
-    removePost(index) {
+    async deletePostOnAPI(id) {
+      try {
+        const res = await fetch(`${API}posts/${id}`, { method: 'DELETE' });
+
+        if (!res.ok) throw new Error(`Error request, status: ${res.status}`);
+
+        const data = await res.json();
+        console.log(data);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    deletePost(index, postId) {
       this.posts.splice(index, 1);
+      this.deletePostOnAPI(postId);
     },
 
     onFullText(index) {
@@ -85,11 +113,20 @@ export default {
         this.$set(this.posts[index], 'isFullText', false);
       }
     },
+
+    updatePage() {
+      this.getPosts(this.page);
+    },
   },
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-
+.pagination {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  list-style: none;
+}
 </style>
