@@ -54,7 +54,6 @@ export default new Vuex.Store({
         if (!res.ok) throw new Error(`Error request, status: ${res.status}`);
 
         const data = await res.json();
-        console.log(data);
         state.commit('setPosts', data);
       } catch (error) {
         console.log(error);

@@ -65,9 +65,6 @@ export default {
         const res = await fetch(`${API}posts/${id}`, { method: 'DELETE' });
 
         if (!res.ok) throw new Error(`Error request, status: ${res.status}`);
-
-        const data = await res.json();
-        console.log(data);
       } catch (error) {
         console.log(error);
       }
@@ -101,6 +98,10 @@ export default {
 .wrapper-author {
   color: #c4c4c4;
   border-bottom: 2px solid #c4c4c4;
+}
+
+.loading {
+  text-align: center;
 }
 
 .post-body {
