@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container-posts">
     <div v-if="errored">
       <p>
         We're sorry, we're not able to retrieve this information at the moment,
@@ -9,19 +9,22 @@
     <div v-else>
       <div class="loading" v-if="loading">Loading...</div>
     </div>
-    <section v-for="(post, index) in posts" :key="post.id">
-      <h2 >title: {{post.title}}
-        <button @click="deletePost(index, post.id)">Delete</button>
-      </h2>
-      <span v-for="person in authors" :key="person.id">
-        {{post.userId === person.id ? `author: ${person.name}` : null}}
-      </span>
-      <p v-if="!post.isFullText">{{`${post.body.substr(0, 100)}...`}}</p>
-      <p v-if="post.isFullText">{{post.body}}</p>
-      <button @click="switchPostTextLength(index)">
+    <article class="article" v-for="(post, index) in posts" :key="post.id">
+      <h2 class="header-title">{{post.title}}</h2>
+      <div class="wrapper-author">
+        <span class="author" v-for="author in authors" :key="author.id">
+          {{post.userId === author.id ? author.name : null}}
+        </span>
+      </div>
+      <p class="post-body" v-if="!post.isFullText">{{`${post.body.substr(0, 100)}...`}}</p>
+      <p class="post-body" v-if="post.isFullText">{{post.body}}</p>
+      <div class="wrapper-btn">
+        <button class="btn-more" @click="switchPostTextLength(index)">
         {{post.isFullText ? 'Read less' : 'Read more'}}
-      </button>
-    </section>
+        </button>
+        <button class="btn-delete" @click="deletePost(index, post.id)">Delete</button>
+      </div>
+    </article>
     <Pagination />
   </div>
 </template>
@@ -88,4 +91,61 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+.container-posts {
+  @media (min-width: 680px) {
+    width: 640px;
+    margin: 0 auto;
+  }
+}
+
+.wrapper-author {
+  color: #c4c4c4;
+  border-bottom: 2px solid #c4c4c4;
+}
+
+.post-body {
+  font-size: 1.2rem;
+  margin-bottom: 28px;
+}
+
+.wrapper-btn {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 8px 52px;
+}
+
+.btn-more, .btn-delete {
+  width: 46%;
+  height: 48px;
+  font-size: 16px;
+  font-weight: 600;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.63;
+  letter-spacing: -.52px;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 6px;
+  border: none;
+  color: #fff;
+  background-color: #34394f;
+
+  &:focus {
+    outline: none;
+    border-radius: 6px;
+    border: solid 2px #c4c4c4;
+  }
+
+  @media (min-width: 360px) {
+    width: 40%;
+  }
+
+  @media (min-width: 540px) {
+    width: 25%;
+  }
+
+  @media (min-width: 640px) {
+    width: 25%;
+  }
+}
 </style>
