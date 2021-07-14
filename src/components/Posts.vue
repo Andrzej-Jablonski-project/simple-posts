@@ -22,7 +22,7 @@
         <button class="btn-more" @click="switchPostTextLength(index)">
         {{post.isFullText ? 'Read less' : 'Read more'}}
         </button>
-        <button class="btn-delete" @click="deletePost(index, post.id)">Delete</button>
+        <button class="btn-delete" @click="deletePost(post.id)">Delete</button>
       </div>
     </article>
     <Pagination />
@@ -32,10 +32,12 @@
 <script>
 import { API_BASE_URL as API } from '@/const/assets';
 import { mapGetters } from 'vuex';
+import mixin from '@/mixins/updatePage';
 import Pagination from './Pagination.vue';
 
 export default {
   name: 'Posts',
+  mixins: [mixin],
   components: {
     Pagination,
   },
@@ -46,16 +48,18 @@ export default {
   },
 
   mounted() {
-    this.$store.dispatch('getPosts');
     this.$store.dispatch('getAuthors');
+    this.$store.dispatch('getAllPosts');
   },
 
   computed: {
     ...mapGetters({
+      allPosts: 'getAllPosts',
       posts: 'getPosts',
       authors: 'getAuthors',
       loading: 'getLoading',
       errored: 'getErrored',
+      page: 'getPage',
     }),
   },
 
@@ -70,8 +74,14 @@ export default {
       }
     },
 
-    deletePost(index, postId) {
-      this.posts.splice(index, 1);
+    deletePost(postId) {
+      const newAllPosts = this.allPosts.filter((post) => post.id !== postId);
+      this.$store.commit('setAllPosts', newAllPosts);
+      this.updatePage();
+      if (this.posts.length === 0) {
+        this.$store.commit('setPage', this.page - 1);
+        this.updatePage();
+      }
       this.deletePostOfApi(postId);
     },
 

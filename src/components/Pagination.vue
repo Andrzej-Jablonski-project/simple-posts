@@ -20,15 +20,16 @@
 <script>
 import Paginate from 'vuejs-paginate';
 import { mapGetters } from 'vuex';
+import mixin from '@/mixins/updatePage';
 
 export default {
   name: 'Pagination',
+  mixins: [mixin],
   components: {
     Paginate,
   },
 
   mounted() {
-    this.$store.dispatch('getAllPosts');
   },
 
   computed: {
@@ -49,13 +50,6 @@ export default {
 
     pageCount() {
       return Math.ceil(this.allPosts.length / 10);
-    },
-  },
-
-  methods: {
-    updatePage() {
-      this.$store.dispatch('getPosts');
-      this.$store.dispatch('getAuthors');
     },
   },
 };

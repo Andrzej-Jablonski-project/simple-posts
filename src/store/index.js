@@ -47,22 +47,6 @@ export default new Vuex.Store({
     },
   },
   actions: {
-    async getPosts(state) {
-      try {
-        const res = await fetch(`${API}posts?_page=${this.state.page}`, { method: 'GET' });
-
-        if (!res.ok) throw new Error(`Error request, status: ${res.status}`);
-
-        const data = await res.json();
-        state.commit('setPosts', data);
-      } catch (error) {
-        console.log(error);
-        state.commit('setErrored', true);
-      } finally {
-        state.commit('setLoading', false);
-      }
-    },
-
     async getAllPosts(state) {
       try {
         const res = await fetch(`${API}posts`, { method: 'GET' });
@@ -71,8 +55,12 @@ export default new Vuex.Store({
 
         const data = await res.json();
         state.commit('setAllPosts', data);
+        state.commit('setPosts', [...data].splice(0, 10));
       } catch (error) {
         console.log(error);
+        state.commit('setErrored', true);
+      } finally {
+        state.commit('setLoading', false);
       }
     },
 
@@ -98,5 +86,6 @@ export default new Vuex.Store({
     getAuthors: (state) => state.authors,
     getLoading: (state) => state.loading,
     getErrored: (state) => state.errored,
+    getPage: (state) => state.page,
   },
 });
